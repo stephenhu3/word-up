@@ -18,7 +18,7 @@ from worker import conn
 #################
 
 app = Flask(__name__)
-# app.config.from_object(os.environ['APP_SETTINGS'])
+app.config.from_object('config')
 db = SQLAlchemy(app)
 
 q = Queue(connection=conn)
@@ -35,8 +35,10 @@ def count_and_save_words(url):
     errors = []
 
     try:
+        print ("attempting to make request")
         r = requests.get(url)
     except:
+        print ("unable to make request")
         errors.append(
             "Unable to get URL. Please make sure it's valid and try again."
         )
@@ -59,6 +61,7 @@ def count_and_save_words(url):
 
     # save the results
     try:
+        print ("attempting to save to db")
         result = Result(
             url=url,
             result_all=raw_word_count,
@@ -68,6 +71,8 @@ def count_and_save_words(url):
         db.session.commit()
         return result.id
     except:
+        print ("failed to save to db")
+        # this is where fail occurs
         errors.append("Unable to add item to database.")
         return {"error": errors}
 
@@ -84,9 +89,7 @@ def index():
         url = request.form['url']
         if 'http://' not in url[:7]:
             url = 'http://' + url
-        job = q.enqueue_call(
-            func=count_and_save_words, args=(url,), result_ttl=5000
-        )
+        job = q.enqueue(count_and_save_words, url)
         print(job.get_id())
 
     return render_template('index.html', results=results)
@@ -96,11 +99,15 @@ def index():
 def get_results(job_key):
 
     job = Job.fetch(job_key, connection=conn)
+    # job = q.fetch_job(job_key)
+    # print(job.get_id())
 
     if job.is_finished:
+        print (str(job.result))
         return str(job.result), 200
     else:
-        return "Nay!", 202
+        print ("not done")
+        return "not done"
 
 
 if __name__ == '__main__':
