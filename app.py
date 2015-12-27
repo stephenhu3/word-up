@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
 from stop_words import stops
 from collections import Counter
@@ -12,7 +12,7 @@ from rq import Queue
 from rq.job import Job
 from worker import conn
 
-
+from sqlalchemy import exc
 #################
 # configuration #
 #################
@@ -70,7 +70,10 @@ def count_and_save_words(url):
         db.session.add(result)
         db.session.commit()
         return result.id
-    except:
+    except exc.SQLAlchemyError:
+        # print (exc.SQLAlchemyError)
+        print (exc.SQLAlchemyError.statement)
+        print (exc.SQLAlchemyError.orig)
         print ("failed to save to db")
         # this is where fail occurs
         errors.append("Unable to add item to database.")
@@ -103,8 +106,16 @@ def get_results(job_key):
     # print(job.get_id())
 
     if job.is_finished:
-        print (str(job.result))
-        return str(job.result), 200
+        print ("job is finished")
+        return "job is finished"
+        # print (str(job.result))
+        # result = Result.query.filter_by(id=job.result).first()
+        # results = sorted(
+        #     result.result_no_stop_words.items(),
+        #     key=operator.itemgetter(1),
+        #     reverse=True
+        # )[:10]
+        # return jsonify(results)
     else:
         print ("not done")
         return "not done"
