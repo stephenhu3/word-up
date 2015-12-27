@@ -1,2 +1,2 @@
 #!/bin/bash
-python worker.py
+heroku run python worker.py
