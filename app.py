@@ -8,6 +8,7 @@ import os
 import requests
 import re
 import nltk
+from sqlalchemy import exc
 
 
 #################
@@ -18,7 +19,7 @@ app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
 db = SQLAlchemy(app)
 
-from models import Result
+from models import *
 
 
 ##########
@@ -70,8 +71,9 @@ def index():
                 )
                 db.session.add(result)
                 db.session.commit()
-            except:
+            except (exc.SQLAlchemyError, exc.DBAPIError) as e:
                 errors.append("Unable to add item to database.")
+                errors.append(e)
     return render_template('index.html', errors=errors, results=results)
 
 
