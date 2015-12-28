@@ -97,7 +97,7 @@ def get_results(job_key):
     job = Job.fetch(job_key, connection=conn)
 
     if job.is_finished:
-        result = Result.query.filter_by(id=job.result).first()
+        result = Result.query.filter_by(url=job.result).first()
         results = sorted(
             result.result_no_stop_words.items(),
             key=operator.itemgetter(1),
