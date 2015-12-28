@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from rq import Queue
 from rq.job import Job
 from worker import conn
+from sqlalchemy import exc
 import operator
 import os
 import requests
@@ -65,8 +66,9 @@ def count_and_save_words(url):
         db.session.add(result)
         db.session.commit()
         return result.id
-    except:
+    except (exc.SQLAlchemyError, exc.DBAPIError) as e:
         errors.append("Unable to add item to database.")
+        errors.append(e)
         return {"error": errors}
 
 ##########
