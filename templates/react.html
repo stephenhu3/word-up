@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Word Up</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0/react.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0/react-dom.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.2/marked.min.js"></script>
+        <link rel="stylesheet" href="https://bootswatch.com/superhero/bootstrap.min.css"/>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.3/react.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.3/react-dom.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react-bootstrap/0.28.1/react-bootstrap.min.js"></script>
+        <script>
+            // Import Bootstrap components used
+            // var Panel = ReactBootstrap.Panel;
+            // var Modal = ReactBootstrap.Modal;
+            // var ModalBody = ReactBootstrap.ModalBody;
+            // var ModalDialog = ReactBootstrap.ModalDialog;
+            // var ModalFooter = ReactBootstrap.ModalFooter;
+            // var ModalHeader = ReactBootstrap.ModalHeader;
+            // var ModalTitle = ReactBootstrap.ModalTitle;
+            // var Popover = ReactBootstrap.Popover;
+            // var Tooltip = ReactBootstrap.Tooltip;
+            var Button = ReactBootstrap.Button;
+            // var OverlayTrigger = ReactBootstrap.OverlayTrigger;
+            // var Input = ReactBootstrap.Input;
+            // var ButtonInput = ReactBootstrap.ButtonInput;
+            // var Glyphicon = ReactBootstrap.Glyphicon;
+            // var Table = ReactBootstrap.Table;
+            var Jumbotron = ReactBootstrap.Jumbotron;
+            var Grid = ReactBootstrap.Grid;
+            var Row = ReactBootstrap.Row;
+            var Col = ReactBootstrap.Col;
+            var Input = ReactBootstrap.Input;
+        </script>
+    </head>
+    <body>
+        <div id="content"></div>
+        <script type="text/babel">
+            var GridLayout = React.createClass({
+                render: function() {
+                    return(
+                    <Grid>
+                        <Row className="show-grid">
+                          <Col xs={12} md={12}><Jumbo/></Col>
+                        </Row>
+
+                        <Row className="show-grid">
+                          <Col xs={12} md={12}>Text here</Col>
+                        </Row>
+
+                        <Row className="show-grid">
+                          <Col xs={12} md={12}>More text here</Col>
+                        </Row>
+                    </Grid>    
+                    );
+                }
+            })
+
+            var Jumbo = React.createClass({
+                getInitialState: function() {
+                    return {
+                        // showModal: false,
+                        // patientHistory: []
+                    };
+                },
+
+                componentDidMount: function() {
+                    // var patientHistoryEndpoint = Constants["apiUrl"] + "/patienthistory/patient/" + this.props.patient_id;
+                    // $.get(patientHistoryEndpoint, function(result) {
+                    //     if (this.isMounted()) {
+                    //         console.log(result);
+                    //         this.setState({
+                    //             patientHistory: result
+                    //         });
+                    //     }
+                    // }.bind(this));
+                },
+
+                rawMarkup: function() {
+                    var rawMarkup = marked(this.props.children.toString(), {sanitize: true});
+                    return { __html: rawMarkup };
+                },
+
+                close() {
+                    this.setState({ showModal: false });
+                },
+
+                open() {
+                    this.setState({ showModal: true });
+                },
+
+                render: function() {
+                    return (
+                      <Jumbotron>
+                        <h1>Word Up!</h1>
+                        <p>Enter a URL and view the most frequently used words on the webpage.</p>
+                        <URLInput/>
+                        <p><Button bsStyle="primary">Analyze!</Button></p>
+                      </Jumbotron>
+                    );
+                }
+            });
+
+            var URLInput = React.createClass({
+                getInitialState() {
+                    return {
+                      value: ''
+                    };
+                },
+
+                validateURL(url) {
+                    return /^(https?|s?ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(url);
+                },
+
+                validationState() {
+                    if (this.state.value.length > 0)
+                        return this.validateURL(this.state.value) ? 'success' : 'error';
+                },
+
+                validationText() {
+                    if (this.state.value.length <= 0)
+                        return 'Enter a URL in this form: http://snakes.com';
+                    else
+                        return this.validateURL(this.state.value) ? 'Entered URL is valid' : 'Entered URL is invalid';
+                },
+
+                handleChange() {
+                    this.setState({
+                      value: this.refs.input.getValue()
+                    });
+                },
+
+                render() {
+                    return (
+                        <Input
+                        type="text"
+                        value={this.state.value}
+                        placeholder="Enter URL of webpage"
+                        label={this.validationText()}
+                        bsStyle={this.validationState()}
+                        hasFeedback
+                        ref="input"
+                        groupClassName="group-class"
+                        labelClassName="label-class"
+                        onChange={this.handleChange}/>
+                    );
+                }
+            });
+
+            ReactDOM.render(
+                <GridLayout/>,
+                document.getElementById('content')
+            );
+
+        </script>
+    </body>
+</html>

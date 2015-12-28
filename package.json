@@ -1,0 +1,24 @@
+{
+  "name": "word-up",
+  "version": "1.0.0",
+  "description": "Analyze word usage frequency on websites",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stephenhu3/word-up.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stephenhu3/word-up/issues"
+  },
+  "homepage": "https://github.com/stephenhu3/word-up#readme",
+  "dependencies": {
+    "react": "^0.14.3",
+    "react-bootstrap": "^0.28.1",
+    "react-dom": "^0.14.3"
+  }
+}
