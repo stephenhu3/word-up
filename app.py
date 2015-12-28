@@ -12,6 +12,7 @@ import os
 import requests
 import re
 import nltk
+import json
 
 #################
 # configuration #
@@ -93,16 +94,16 @@ def index():
 
 @app.route("/results/<job_key>", methods=['GET'])
 def get_results(job_key):
-
     job = Job.fetch(job_key, connection=conn)
 
     if job.is_finished:
         result = Result.query.filter_by(url=job.result).first()
+        no_stop_words_dict = json.loads(result.result_no_stop_words)
         results = sorted(
-            result.result_no_stop_words.items(),
+            no_stop_words_dict.items(),
             key=operator.itemgetter(1),
             reverse=True
-        )[:10]
+        )[:25]
         return jsonify(results)
     else:
         return "Nay!", 202
