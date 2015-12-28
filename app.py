@@ -65,7 +65,7 @@ def count_and_save_words(url):
         )
         db.session.add(result)
         db.session.commit()
-        return result.id
+        return result.url
     except (exc.SQLAlchemyError, exc.DBAPIError) as e:
         errors.append("Unable to add item to database.")
         errors.append(e)
