@@ -98,17 +98,50 @@
                         <h1>Word Up!</h1>
                         <p>Enter a URL and view the most frequently used words on the webpage.</p>
                         <URLInput/>
-                        <p><Button bsStyle="primary">Analyze!</Button></p>
                       </Jumbotron>
                     );
                 }
             });
 
-            var URLInput = React.createClass({
+             var URLInput = React.createClass({
                 getInitialState() {
                     return {
-                      value: ''
+                      value: '',
+                      wordFrequency: 'nothing here yet'
                     };
+                },
+
+                handleFormSubmit() {
+                    var postEndpoint = this.window.location.hostname + "/analyze";
+                    console.log(postEndpoint)
+                    var postxhr = $.ajax({
+                        url: postEndpoint,
+                        method: "POST",
+                        data: this.refs.input.getValue(),
+                        dataType: "text"
+                    });
+                     
+                    postxhr.done(function( data ) {
+                        var jobId = data;
+                        var getEndpoint = this.window.location.hostname + "/results/" + jobId;
+                        var getxhr = $.ajax({
+                            url: getEndpoint,
+                            method: "GET",
+                            dataType: "json"
+                        });
+
+                        getxhr.done(function( data ) {
+                            this.setState({ wordFrequency: data });
+                        })
+                        .fail(function( xhr, error ) {
+                            console.log("Error retrieving results");
+                            console.log("Error Code: " + xhr.status + " Error Occurred:" + error);
+                        });
+                    })
+                    .fail(function( xhr, error ) {
+                        console.log("Error sending request");
+                        console.log("Error Code: " + xhr.status + " Error Occurred:" + error);
+                    });
                 },
 
                 validateURL(url) {
@@ -135,6 +168,8 @@
 
                 render() {
                     return (
+                        <div>
+                        {this.state.wordFrequency}
                         <Input
                         type="text"
                         value={this.state.value}
@@ -146,6 +181,8 @@
                         groupClassName="group-class"
                         labelClassName="label-class"
                         onChange={this.handleChange}/>
+                        <Button bsStyle="primary" onClick={this.handleFormSubmit}>Analyze!</Button>
+                        </div>
                     );
                 }
             });

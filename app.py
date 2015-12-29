@@ -78,6 +78,34 @@ def count_and_save_words(url):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    return render_template('index.html')
+
+@app.route('/analyze', methods=['POST'])
+def get_counts():
+    request.get_data()
+    # print(request.data)
+    print(request.data.decode())
+    # print(request.form)
+    # print(request.headers['Content-Type'])
+    # if request.headers['Content-Type'] == 'application/x-www-form-urlencoded':
+    # print(request.data.decode())
+    # print(request)
+    url = request.data.decode()
+    # format URL as http
+    if 'https://' in url[:8]:
+        url = 'http://' + url[8:]
+    elif 'http://' not in url[:7]:
+        url = 'http://' + url
+    # start job
+    job = q.enqueue_call(
+        func=count_and_save_words, args=(url,), result_ttl=5000
+    )
+    # return created job id
+    return job.get_id()
+    # return "lol"
+
+@app.route('/react', methods=['GET', 'POST'])
+def react():
     results = {}
     if request.method == "POST":
         # get url that the person has entered
@@ -89,7 +117,7 @@ def index():
         )
         print(job.get_id())
 
-    return render_template('index.html', results=results)
+    return render_template('react.html', results=results)
 
 
 @app.route("/results/<job_key>", methods=['GET'])

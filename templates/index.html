@@ -1,59 +1,233 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Wordcount</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <style>
-      .container {
-        max-width: 1000px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="row">
-        <div class="col-sm-5 col-sm-offset-1">
-          <h1>Word Up</h1>
-          <br>
-          <form role="form" method="POST" action="/">
-            <div class="form-group">
-              <input type="text" name="url" class="form-control" id="url-box" placeholder="Enter URL..." style="max-width: 300px;">
-            </div>
-            <button type="submit" class="btn btn-default">Submit</button>
-          </form>
-          <br>
-          {% for error in errors %}
-            <h4>{{ error }}</h4>
-          {% endfor %}
-          <br>
-        </div>
-        <div class="col-sm-5 col-sm-offset-1">
-          {% if results %}
-            <h2>25 Most Frequently Used</h2>
-            <br>
-            <div id="results">
-              <table class="table table-striped" style="max-width: 300px;">
-                <thead>
-                  <tr>
-                    <th>Word</th>
-                    <th>Count</th>
-                  </tr>
-                </thead>
-                {% for result in results%}
-                  <tr>
-                    <td>{{ result[0] }}</td>
-                    <td>{{ result[1] }}</td>
-                  </tr>
-                {% endfor %}
-              </table>
-            </div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-    <br><br>
-    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-  </body>
+    <head>
+        <meta charset="utf-8">
+        <title>Word Up</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0/react.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0/react-dom.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.2/marked.min.js"></script>
+        <link rel="stylesheet" href="https://bootswatch.com/superhero/bootstrap.min.css"/>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.3/react.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.3/react-dom.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react-bootstrap/0.28.1/react-bootstrap.min.js"></script>
+        <script>
+            // Import Bootstrap components used
+            var Button = ReactBootstrap.Button;
+            var Table = ReactBootstrap.Table;
+            var Jumbotron = ReactBootstrap.Jumbotron;
+            var Grid = ReactBootstrap.Grid;
+            var Row = ReactBootstrap.Row;
+            var Col = ReactBootstrap.Col;
+            var Input = ReactBootstrap.Input;
+            // Unused (uncomment if adding)
+            // var Panel = ReactBootstrap.Panel;
+            // var Modal = ReactBootstrap.Modal;
+            // var ModalBody = ReactBootstrap.ModalBody;
+            // var ModalDialog = ReactBootstrap.ModalDialog;
+            // var ModalFooter = ReactBootstrap.ModalFooter;
+            // var ModalHeader = ReactBootstrap.ModalHeader;
+            // var ModalTitle = ReactBootstrap.ModalTitle;
+            // var Popover = ReactBootstrap.Popover;
+            // var Tooltip = ReactBootstrap.Tooltip;
+            // var OverlayTrigger = ReactBootstrap.OverlayTrigger;
+            // var Input = ReactBootstrap.Input;
+            // var ButtonInput = ReactBootstrap.ButtonInput;
+            // var Glyphicon = ReactBootstrap.Glyphicon;
+        </script>
+    </head>
+    <body>
+        <div id="content"></div>
+        <script type="text/babel">
+            var GridLayout = React.createClass({
+                render: function() {
+                    return(
+                    <Grid>
+                        <Row className="show-grid">
+                          <Col xs={12} md={12}><Jumbo/></Col>
+                        </Row>
+
+                        <Row className="show-grid">
+                          <Col xs={12} md={12}>This was a simple hobby project built with Flask, PostgreSQL, and React</Col>
+                        </Row>
+
+                        <Row className="show-grid">
+                          <Col xs={12} md={12}>Developed by Stephen Hu</Col>
+                        </Row>
+                    </Grid>    
+                    );
+                }
+            })
+
+            var Jumbo = React.createClass({
+                getInitialState: function() {
+                    return {
+                    };
+                },
+
+                componentDidMount: function() {
+                },
+
+                rawMarkup: function() {
+                    var rawMarkup = marked(this.props.children.toString(), {sanitize: true});
+                    return { __html: rawMarkup };
+                },
+
+                close() {
+                    this.setState({ showModal: false });
+                },
+
+                open() {
+                    this.setState({ showModal: true });
+                },
+
+                render: function() {
+                    return (
+                      <Jumbotron>
+                        <h1>Word Up!</h1>
+                        <p>Enter a URL and view the most frequently used words on the webpage.</p>
+                        <URLInput/>
+                      </Jumbotron>
+                    );
+                }
+            });
+
+             var URLInput = React.createClass({
+                getInitialState() {
+                    return {
+                      value: '',
+                      wordFrequency: []
+                    };
+                },
+
+                handleRequestPolling(data) {
+                    var jobId = data;
+                    var getEndpoint = "/results/" + jobId;
+                    var getxhr = $.ajax({
+                        url: getEndpoint,
+                        method: "GET",
+                        dataType: "json"
+                    });
+
+                    var that = this;
+                    getxhr.done(function( data ) {
+                        that.setState({ wordFrequency: data });
+                    })
+                    .fail(function( xhr, error ) {
+                        if (xhr.status == 202)
+                            return that.handleRequestPolling(data);
+                        console.log("Error retrieving results");
+                        console.log("Error Code: " + xhr.status + " Error Occurred:" + error);
+                    });
+                },
+
+                handleFormSubmit() {
+                    var postEndpoint = "/analyze";
+                    console.log(postEndpoint);
+                    console.log(this.refs.input.getValue());
+                    var postxhr = $.ajax({
+                        url: postEndpoint,
+                        method: "POST",
+                        data: this.refs.input.getValue(),
+                        dataType: "text"
+                    });
+                    
+                    var that = this; // needed for accessing this context for handleRequestPolling in following closure
+                    postxhr.done(function(data) {
+                        return that.handleRequestPolling(data);
+                    })
+                    .fail(function( xhr, error ) {
+                        console.log("Error retrieving results");
+                        console.log("Error Code: " + xhr.status + " Error Occurred:" + error);
+                    });
+                },
+
+                validateURL(url) {
+                    return /^(https?|s?ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(url);
+                },
+
+                validationState() {
+                    if (this.state.value.length > 0)
+                        return this.validateURL(this.state.value) ? 'success' : 'error';
+                },
+
+                validationText() {
+                    if (this.state.value.length <= 0)
+                        return 'Enter a URL in this form: http://snakes.com';
+                    else
+                        return this.validateURL(this.state.value) ? 'Entered URL is valid' : 'Entered URL is invalid';
+                },
+
+                handleChange() {
+                    this.setState({
+                      value: this.refs.input.getValue()
+                    });
+                },
+
+                displayResults() {
+                    if (!jQuery.isEmptyObject(this.state.wordFrequency)) {
+                        var freq = this.state.wordFrequency;
+                        var rows = [];
+                        var colors = ["success", "info","danger", "warning"];
+                        var index = 0;
+                        for (var key in freq) {
+                          if (freq.hasOwnProperty(key)) {
+                            console.log(key);
+                            console.log(freq[key]);
+                            rows.push(
+                                <tr className={colors[index++ % 4]}>
+                                    <td key={key}><h5>{key}</h5></td>
+                                    <td key={freq[key]}><h5>{freq[key]}</h5></td>
+                                </tr>
+                            )
+                          }
+                        }
+                        return (
+                            <div>
+                                <h3>25 Most Frequently Used</h3>
+                                <Table striped bordered hover>
+                                    <thead>
+                                      <tr className="active">
+                                        <th><h4>Word</h4></th>
+                                        <th><h4>Count</h4></th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                        {rows}
+                                    </tbody>
+                                </Table>
+                            </div>
+                        )
+                    }
+                },
+
+                render() {
+                    return (
+                        <div>
+                        <Input
+                        type="text"
+                        value={this.state.value}
+                        placeholder="Enter URL of webpage"
+                        label={this.validationText()}
+                        bsStyle={this.validationState()}
+                        hasFeedback
+                        ref="input"
+                        groupClassName="group-class"
+                        labelClassName="label-class"
+                        onChange={this.handleChange}/>
+                        <Button bsStyle="primary" onClick={this.handleFormSubmit}>Analyze!</Button>
+                        {this.displayResults()}
+                        </div>
+                    );
+                }
+            });
+
+            ReactDOM.render(
+                <GridLayout/>,
+                document.getElementById('content')
+            );
+
+        </script>
+    </body>
 </html>
