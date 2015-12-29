@@ -127,11 +127,13 @@ def get_results(job_key):
     if job.is_finished:
         result = Result.query.filter_by(url=job.result).first()
         no_stop_words_dict = json.loads(result.result_no_stop_words)
+        # return the top 25 most frequently used words
         results = sorted(
             no_stop_words_dict.items(),
             key=operator.itemgetter(1),
             reverse=True
         )[:25]
+        # returned json is unordered collection, so client side needs to sort results
         return jsonify(results)
     else:
         return "Nay!", 202

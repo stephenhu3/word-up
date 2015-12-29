@@ -124,8 +124,6 @@
 
                 handleFormSubmit() {
                     var postEndpoint = "/analyze";
-                    console.log(postEndpoint);
-                    console.log(this.refs.input.getValue());
                     var postxhr = $.ajax({
                         url: postEndpoint,
                         method: "POST",
@@ -168,20 +166,20 @@
                 displayResults() {
                     if (!jQuery.isEmptyObject(this.state.wordFrequency)) {
                         var freq = this.state.wordFrequency;
+                        var sortFreq = [];
+                        for (var pair in freq)
+                            sortFreq.push([pair, freq[pair]])
+                        sortFreq.sort(function(a, b) {return -(a[1] - b[1])})
                         var rows = [];
                         var colors = ["success", "info","danger", "warning"];
                         var index = 0;
-                        for (var key in freq) {
-                          if (freq.hasOwnProperty(key)) {
-                            console.log(key);
-                            console.log(freq[key]);
+                        for (var i = 0; i < sortFreq.length; i++) {
                             rows.push(
                                 <tr className={colors[index++ % 4]}>
-                                    <td key={key}><h5>{key}</h5></td>
-                                    <td key={freq[key]}><h5>{freq[key]}</h5></td>
+                                    <td key={sortFreq[i][0]}><h5>{sortFreq[i][0]}</h5></td>
+                                    <td key={sortFreq[i][1]}><h5>{sortFreq[i][1]}</h5></td>
                                 </tr>
                             )
-                          }
                         }
                         return (
                             <div>
