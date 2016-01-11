@@ -1,7 +1,9 @@
 ## Website Word Counter
 
-### Powered by Flask, PostgreSQL, and SQLAchlemy
-### Front-end built with React and r-dom wrapper
+### Powered by Flask, PostgreSQL, and SQLAlchemy
+### Front-end built with React
+
+https://word-up-flask.herokuapp.com
 
 - Automatic deploys from release branch
 - Development environment on dev branch
