@@ -5,5 +5,4 @@
 
 https://word-up-flask.herokuapp.com
 
-- Automatic deploys from release branch
-- Development environment on dev branch
+- Development environment on dev branch with automatic deployments
