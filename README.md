@@ -3,5 +3,4 @@
 ### Powered by Flask, PostgreSQL, and SQLAchlemy
 ### Front-end built with React and r-dom wrapper
 
-- Automatic deploys from release branch
-- Development environment on dev branch
+- Development environment on dev branch with automatic deployments
